@@ -11,9 +11,24 @@ from auth import UserCreate, Token, authenticate_user, create_access_token, get_
 from models import User, Prediction
 from config import DATABASE_URL
 from sqlalchemy.ext.declarative import declarative_base
+from fastapi.middleware.cors import CORSMiddleware
 
 # Initialize FastAPI app
 app = FastAPI()
+
+# List of allowed origins (React frontend)
+origins = [
+    "http://localhost:3000",
+]
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["*"],
+)
 
 # Loading the trained model and scaler
 model = joblib.load("breast_cancer_model.pkl")

@@ -101,6 +101,17 @@ def predict(data: CancerFeatures, db: Session = Depends(get_db), user: User = De
 
     return {"prediction": result}
 
+@app.get("/predictions/")
+def get_all_predictions(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    """
+    Fetch all predictions from the database.
+    """
+    predictions = db.query(Prediction).all()
+
+    if not predictions:
+        raise HTTPException(status_code=404, detail="No predictions found.")
+    return predictions
+
 
 @app.post("/predict_batch/")
 async def predict_batch(file: UploadFile = File(...), db: Session = Depends(get_db), user: User = Depends(get_current_user)):

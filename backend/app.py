@@ -12,6 +12,7 @@ from models import User, Prediction
 from config import DATABASE_URL
 from sqlalchemy.ext.declarative import declarative_base
 from fastapi.middleware.cors import CORSMiddleware
+from time import sleep
 
 # Initialize FastAPI app
 app = FastAPI()
@@ -78,6 +79,14 @@ def login(user: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Invalid credentials")
     access_token = create_access_token({"sub": db_user.username})
     return {"access_token": access_token, "token_type": "bearer"}
+
+@app.get("/validate-token/")
+def validate_token(current_user: User = Depends(get_current_user)):
+    """
+    Valida o token JWT.
+    Retorna o usuário atual se o token for válido.
+    """
+    return {"message": "The authentication token is valid!"}
 
 
 ### **Prediction Endpoin**

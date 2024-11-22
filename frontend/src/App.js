@@ -6,6 +6,7 @@ import DoctorExplanationView from "./components/Predictions/DoctorExplanationVie
 import PatientExplanationView from "./components/Predictions/PatientExplanationView";
 import BreastCancerPredictionForm from "./components/Predict/BreastCancerPredictionForm";
 import PredictionsPage from "./components/Predictions/Predictions";
+import ProtectedRoute from "./Auth/ProtectedRoute";
 
 const features = [
   17.99, 10.38, 122.8, 1001.0, 0.1184, 0.2776, 0.3001, 0.1471, 0.2419, 0.07871, 
@@ -19,13 +20,43 @@ function App() {
     <Router>
       <div className="App">
         <Routes>
-          <Route path="/" element={<BreastCancerPredictionForm />} />
-          <Route path="/batch-upload" element={<BatchPrediction />} />
-          <Route path="/predict" element={<BreastCancerPredictionForm  />} />
-          <Route path="/predictions" element={<PredictionsPage />} />
-          <Route path="/explain-doctor" element={<DoctorExplanationView features={features} />} />
-          <Route path="/explain-patient" element={<PatientExplanationView features={features} />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/" element={
+              <ProtectedRoute>
+                <BreastCancerPredictionForm/>
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/batch-upload" element={
+              <ProtectedRoute>
+                <BatchPrediction/>
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/predict" element={
+              <ProtectedRoute>
+                <BreastCancerPredictionForm/>
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/predictions" element={
+              <ProtectedRoute>
+                <PredictionsPage/>
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/explain-doctor" element={
+              <ProtectedRoute>
+                <DoctorExplanationView features={features}/>
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/explain-patient" element={
+              <ProtectedRoute>
+                <PatientExplanationView features={features}/>
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </div>
     </Router>

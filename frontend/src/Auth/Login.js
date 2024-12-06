@@ -3,6 +3,7 @@ import { useAuth } from "./AuthContext";
 import Navbar from "../components/Navbar";
 import Spinner from "../components/assets/Spinner";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const { login } = useAuth();
@@ -10,6 +11,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,10 +22,9 @@ function Login() {
         username,
         password,
       });
-      // Store the JWT in localStorage
-      localStorage.setItem("token", response.data.access_token);
-      login();
-      window.location.href = "/";
+      const token = response.data.access_token;
+      login(token);
+      navigate("/");
     } catch (error) {
       setError("Invalid credentials, please try again.");
     } finally {

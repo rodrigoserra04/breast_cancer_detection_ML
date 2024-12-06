@@ -7,11 +7,20 @@ from config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 from database import get_db
 from models import User
 from pydantic import BaseModel
+from models import UserType
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class UserCreate(BaseModel):
+    username: str
+    password: str
+    user_type: UserType
+
+    class Config:
+        orm_mode = True
+
+class UserLogin(BaseModel):
     username: str
     password: str
 

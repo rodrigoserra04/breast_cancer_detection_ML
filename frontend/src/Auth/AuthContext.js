@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
 
 const AuthContext = createContext();
 
@@ -9,6 +10,7 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userType, setUserType] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,7 +29,9 @@ export const AuthProvider = ({ children }) => {
             Authorization: `Bearer ${token}`,
           },
         });
+        const decodedToken = jwtDecode(token);
         setIsAuthenticated(true);
+        setUserType(decodedToken.user_type);
       } catch (error) {
         // IF THE TOKEN IS INVALID, WE SHOULD DELETE USER SESSION
         setIsAuthenticated(false);
@@ -40,17 +44,22 @@ export const AuthProvider = ({ children }) => {
     checkTokenValidity();
   }, []);
 
-  const login = () => {
+  const login = (token) => {
+    const decodedToken = jwtDecode(token);
     setIsAuthenticated(true);
+    setUserType(decodedToken.user_type);
+    localStorage.setItem("token", token);
   };
 
   const logout = () => {
     setIsAuthenticated(false);
+    setUserType(null);
     localStorage.removeItem("token");
   };
 
   const value = {
     isAuthenticated,
+    userType,
     login,
     logout,
     loading,

@@ -7,6 +7,7 @@ import PatientExplanationView from "./components/Predictions/PatientExplanationV
 import BreastCancerPredictionForm from "./components/Predict/BreastCancerPredictionForm";
 import PredictionsPage from "./components/Predictions/Predictions";
 import ProtectedRoute from "./Auth/ProtectedRoute";
+import PublicRoute from "./Auth/PublicRoutes";
 
 const features = [
   17.99, 10.38, 122.8, 1001.0, 0.1184, 0.2776, 0.3001, 0.1471, 0.2419, 0.07871, 
@@ -20,7 +21,11 @@ function App() {
     <Router>
       <div className="App">
         <Routes>
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }/>
           <Route path="/" element={
               <ProtectedRoute>
                 <BreastCancerPredictionForm/>

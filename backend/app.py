@@ -7,7 +7,7 @@ import pandas as pd
 from io import StringIO
 from sqlalchemy import create_engine
 from database import get_db
-from auth import UserCreate, Token, authenticate_user, create_access_token, get_current_user, get_password_hash
+from auth import UserCreate, UserLogin, Token, authenticate_user, create_access_token, get_current_user, get_password_hash
 from models import User, Prediction
 from config import DATABASE_URL
 from sqlalchemy.ext.declarative import declarative_base
@@ -64,21 +64,29 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     Register a new user.
     """
     hashed_password = get_password_hash(user.password)
-    db_user = User(username=user.username, password=hashed_password)
+    db_user = User(username=user.username, password=hashed_password, user_type=user.user_type)
     db.add(db_user)
     db.commit()
     return {"message": "User registered successfully"}
 
 @app.post("/login/", response_model=Token)
-def login(user: UserCreate, db: Session = Depends(get_db)):
+def login(user: UserLogin, db: Session = Depends(get_db)):
     """
     Login and get access token.
     """
     db_user = authenticate_user(db, user.username, user.password)
     if not db_user:
         raise HTTPException(status_code=400, detail="Invalid credentials")
-    access_token = create_access_token({"sub": db_user.username})
-    return {"access_token": access_token, "token_type": "bearer"}
+    access_token = create_access_token(
+        {
+            "sub": db_user.username,
+            "user_type": db_user.user_type.value
+        }
+    )
+    return {
+        "access_token": access_token,
+        "token_type": "bearer"
+    }
 
 @app.get("/validate-token/")
 def validate_token(current_user: User = Depends(get_current_user)):

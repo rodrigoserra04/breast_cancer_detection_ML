@@ -5,7 +5,7 @@ import Footer from "./Footer";
 import { useNavigate } from "react-router-dom";
 
 function Navbar() {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, userType } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -32,15 +32,22 @@ function Navbar() {
               <li className="py-2 px-4 rounded hover:bg-blue-500 transition block text-white" style={{ cursor: 'pointer' }} onClick={handleLogout}>
                 Logout
               </li>
-              <li className="py-2 px-4 rounded hover:bg-blue-500 transition">
-                <Link to="/predictions" className="block text-white">Predictions (Doctor)</Link>
+              
+              {userType === "doctor" && (
+                <>
+                  <li className="py-2 px-4 rounded hover:bg-blue-500 transition">
+                    <Link to="/predictions" className="block text-white">Predictions (Doctor)</Link>
+                    </li>
+                  <li className="py-2 px-4 rounded hover:bg-blue-500 transition">
+                    <Link to="/explain-doctor" className="block text-white">Prediction Analytics (Doctor)</Link>
+                  </li>
+                </>
+              )}
+              {userType === "patient" && (
+                <li className="py-2 px-4 rounded hover:bg-blue-500 transition">
+                  <Link to="/explain-patient" className="block text-white">Prediction Analytics (Patient)</Link>
                 </li>
-              <li className="py-2 px-4 rounded hover:bg-blue-500 transition">
-                <Link to="/explain-doctor" className="block text-white">Prediction Analytics (Doctor)</Link>
-                </li>
-              <li className="py-2 px-4 rounded hover:bg-blue-500 transition">
-                <Link to="/explain-patient" className="block text-white">Prediction Analytics (Patient)</Link>
-              </li>
+              )}
             </>
           ) : (
             <li className="py-2 px-4 rounded hover:bg-blue-500 transition">

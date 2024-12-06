@@ -27,37 +27,37 @@ function App() {
             </PublicRoute>
           }/>
           <Route path="/" element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["doctor", "patient"]}>
                 <BreastCancerPredictionForm/>
               </ProtectedRoute>
             }
           />
           <Route path="/batch-upload" element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["patient"]}>
                 <BatchPrediction/>
               </ProtectedRoute>
             }
           />
           <Route path="/predict" element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["patient"]}>
                 <BreastCancerPredictionForm/>
               </ProtectedRoute>
             }
           />
           <Route path="/predictions" element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["doctor"]}>
                 <PredictionsPage/>
               </ProtectedRoute>
             }
           />
           <Route path="/explain-doctor" element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["doctor"]}>
                 <DoctorExplanationView features={features}/>
               </ProtectedRoute>
             }
           />
           <Route path="/explain-patient" element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["patient"]}>
                 <PatientExplanationView features={features}/>
               </ProtectedRoute>
             }

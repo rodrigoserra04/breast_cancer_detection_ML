@@ -8,6 +8,7 @@ import BreastCancerPredictionForm from "./components/Predict/BreastCancerPredict
 import PredictionsPage from "./components/Predictions/Predictions";
 import ProtectedRoute from "./Auth/ProtectedRoute";
 import PublicRoute from "./Auth/PublicRoutes";
+import PatientPredictionsList from "./components/Patient/PatientPredictionsList";
 
 const features = [
   17.99, 10.38, 122.8, 1001.0, 0.1184, 0.2776, 0.3001, 0.1471, 0.2419, 0.07871, 
@@ -44,7 +45,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/predictions" element={
+          <Route path="/predictions-doctor" element={
               <ProtectedRoute allowedRoles={["doctor"]}>
                 <PredictionsPage/>
               </ProtectedRoute>
@@ -56,9 +57,15 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/explain-patient" element={
+          <Route path="/prediction-details/:id" element={
               <ProtectedRoute allowedRoles={["patient"]}>
-                <PatientExplanationView features={features}/>
+                <PatientExplanationView/>
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/predictions" element={
+              <ProtectedRoute allowedRoles={["patient"]}>
+                <PatientPredictionsList />
               </ProtectedRoute>
             }
           />

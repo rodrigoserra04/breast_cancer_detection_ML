@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, TIMESTAMP, ForeignKey, Text, Enum
+from sqlalchemy import Column, Integer, String, TIMESTAMP, ForeignKey, Text, Enum, text
 from database import Base
 from enum import Enum as PyEnum
 
@@ -24,4 +24,4 @@ class Prediction(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     input_features = Column(Text)
     prediction_result = Column(Text)
-    created_at = Column(TIMESTAMP, nullable=False)
+    created_at = Column(TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP"))

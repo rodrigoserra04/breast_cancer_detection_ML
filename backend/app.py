@@ -13,6 +13,7 @@ from config import DATABASE_URL
 from sqlalchemy.ext.declarative import declarative_base
 from fastapi.middleware.cors import CORSMiddleware
 from time import sleep
+from fastapi import Query
 
 # Initialize FastAPI app
 app = FastAPI()
@@ -115,8 +116,62 @@ def predict(data: CancerFeatures, db: Session = Depends(get_db), user: User = De
     db_prediction = Prediction(user_id=user.id, input_features=str(data.features), prediction_result=result)
     db.add(db_prediction)
     db.commit()
+    db.refresh(db_prediction)
 
-    return {"prediction": result}
+    return {
+        "prediction": result,
+        "id": db_prediction.id
+    }
+
+@app.get("/user/predictions/")
+def get_user_predictions(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+    order_by: str = Query("created_at", enum=["created_at", "prediction_result"]),
+    order: str = Query("desc", enum=["asc", "desc"]),
+):
+    """
+    Fetch predictions made by the logged-in user.
+    Supports ordering by `created_at` or `prediction_result`.
+    """
+    query = db.query(Prediction).filter(Prediction.user_id == user.id)
+
+    # Apply ordering based on query parameters
+    if order_by == "created_at":
+        query = query.order_by(Prediction.created_at.desc() if order == "desc" else Prediction.created_at.asc())
+    elif order_by == "prediction_result":
+        query = query.order_by(Prediction.prediction_result.desc() if order == "desc" else Prediction.prediction_result.asc())
+
+    predictions = query.all()
+
+    if not predictions:
+        raise HTTPException(status_code=404, detail="No predictions found.")
+    return predictions
+
+@app.get("/predictions/{prediction_id}")
+def get_prediction_details(
+    prediction_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user)
+):
+    """
+    Fetch details of a single prediction by its ID.
+    """
+    prediction = db.query(Prediction).filter(Prediction.id == prediction_id).first()
+
+    if not prediction:
+        raise HTTPException(status_code=404, detail="Prediction not found.")
+
+    if prediction.user_id != user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to access this prediction.")
+
+    return {
+        "id": prediction.id,
+        "user_id": prediction.user_id,
+        "input_features": prediction.input_features,
+        "prediction_result": prediction.prediction_result,
+        "created_at": prediction.created_at,
+    }
 
 @app.get("/predictions/")
 def get_all_predictions(db: Session = Depends(get_db), user: User = Depends(get_current_user)):

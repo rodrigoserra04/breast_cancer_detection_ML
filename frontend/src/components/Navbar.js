@@ -36,7 +36,7 @@ function Navbar() {
               {userType === "doctor" && (
                 <>
                   <li className="py-2 px-4 rounded hover:bg-blue-500 transition">
-                    <Link to="/predictions" className="block text-white">Predictions (Doctor)</Link>
+                    <Link to="/predictions-doctor" className="block text-white">Predictions (Doctor)</Link>
                     </li>
                   <li className="py-2 px-4 rounded hover:bg-blue-500 transition">
                     <Link to="/explain-doctor" className="block text-white">Prediction Analytics (Doctor)</Link>
@@ -45,7 +45,7 @@ function Navbar() {
               )}
               {userType === "patient" && (
                 <li className="py-2 px-4 rounded hover:bg-blue-500 transition">
-                  <Link to="/explain-patient" className="block text-white">Prediction Analytics (Patient)</Link>
+                  <Link to="/predictions" className="block text-white">Predictions</Link>
                 </li>
               )}
             </>

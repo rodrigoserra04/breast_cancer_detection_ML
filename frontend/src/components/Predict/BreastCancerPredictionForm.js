@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import Navbar from "../Navbar";
+import { useNavigate } from "react-router-dom";
 
 function BreastCancerPredictionForm() {
+  const navigate = useNavigate();
   const featureNames = [
     "Mean Radius",
     "Mean Texture",
@@ -37,6 +39,7 @@ function BreastCancerPredictionForm() {
 
   const [features, setFeatures] = useState(Array(30).fill(""));
   const [prediction, setPrediction] = useState(null);
+  const [predictionId, setPredictionId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -65,7 +68,8 @@ function BreastCancerPredictionForm() {
 
       if (response.ok) {
         const data = await response.json();
-        setPrediction(data.prediction);
+        setPrediction(data.prediction); // Save the prediction result
+        setPredictionId(data.id); // Save the prediction ID
       } else {
         setError("Failed to fetch the prediction. Please check your inputs.");
       }
@@ -84,59 +88,69 @@ function BreastCancerPredictionForm() {
       </div>
 
       {/* Main Form Section */}
-      <div className="flex-grow p-8 bg-gray-100">
+      <div className="flex-grow p-8 bg-white">
         <div className="container mx-auto p-8 bg-white shadow-lg rounded-lg">
           <h2 className="text-3xl font-bold text-gray-800 mb-6">
             Breast Cancer Prediction
           </h2>
-          <p className="text-gray-600 mb-8">
-            Enter the required features below to predict whether the breast
-            cancer is malignant or benign.
-          </p>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {featureNames.map((featureName, index) => (
-                <div key={index} className="flex flex-col">
-                  <label
-                    className="text-gray-700 font-medium mb-2"
-                    htmlFor={`feature-${index}`}
-                  >
-                    {featureName}:
-                  </label>
-                  <input
-                    id={`feature-${index}`}
-                    type="number"
-                    step="any"
-                    value={features[index]}
-                    onChange={(e) => handleInputChange(index, e.target.value)}
-                    className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-                    required
-                  />
-                </div>
-              ))}
+          {/* Show Form or Prediction Result, deppending on the user action... */}
+          {prediction ? (
+            <div>
+              {/* Prediction Result */}
+              <div className="mt-8 p-4 bg-green-100 text-green-800 font-medium rounded-md">
+                Prediction Result:{" "}
+                <strong>
+                  {prediction === "Malignant"
+                    ? "Malignant Breast Cancer"
+                    : "Benign Breast Cancer"}
+                </strong>
+              </div>
+
+              {/* View Details Button */}
+              <button
+                className="mt-4 py-3 px-6 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600"
+                onClick={() => navigate(`/prediction-details/${predictionId}`)}
+              >
+                View Details
+              </button>
             </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <p className="text-gray-600 mb-8">
+                Enter the required features below to predict whether the breast
+                cancer is malignant or benign.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {featureNames.map((featureName, index) => (
+                  <div key={index} className="flex flex-col">
+                    <label
+                      className="text-gray-700 font-medium mb-2"
+                      htmlFor={`feature-${index}`}
+                    >
+                      {featureName}:
+                    </label>
+                    <input
+                      id={`feature-${index}`}
+                      type="number"
+                      step="any"
+                      value={features[index]}
+                      onChange={(e) => handleInputChange(index, e.target.value)}
+                      className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+                      required
+                    />
+                  </div>
+                ))}
+              </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 disabled:bg-gray-400"
-            >
-              {loading ? "Predicting..." : "Predict Breast Cancer"}
-            </button>
-          </form>
-
-          {/* Prediction Result */}
-          {prediction && (
-            <div className="mt-8 p-4 bg-green-100 text-green-800 font-medium rounded-md">
-              Prediction Result:{" "}
-              <strong>
-                {prediction === "Malignant"
-                  ? "Malignant Breast Cancer"
-                  : "Benign Breast Cancer"}
-              </strong>
-            </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 disabled:bg-gray-400"
+              >
+                {loading ? "Predicting..." : "Predict Breast Cancer"}
+              </button>
+            </form>
           )}
 
           {/* Error Message */}
